@@ -1,27 +1,29 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
 
 
-```{r LOADING,echo=FALSE}
-options(warn=-1)
-library(ggplot2)
-library(dplyr)
-library(scales)
-library(gridExtra)
-activity <- read.csv("./activity/activity.csv", stringsAsFactors=FALSE)
-options(warn=0)
+
+```
+## 
+## Attaching package: 'dplyr'
+## 
+## The following object is masked from 'package:stats':
+## 
+##     filter
+## 
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+## 
+## Loading required package: grid
 ```
 ## What is mean total number of steps taken per day?
 
 ###1. Make a histogram of the total number of steps taken each day
-```{r HISTOGRAM,echo=TRUE}
+
+```r
 pm.dayly <- aggregate(activity$steps, list(activity$date), sum, na.rm=T)
 names(pm.dayly) <- c("Day", "Total_steps")
 qplot(pm.dayly$Total_steps,
@@ -32,9 +34,12 @@ qplot(pm.dayly$Total_steps,
       fill=I("red"))
 ```
 
+![](PA1_template_files/figure-html/HISTOGRAM-1.png) 
+
 ###2. Calculate and report the mean and median total number of steps taken per day
 
-```{r MEANANDMEDIAN,echo=TRUE}
+
+```r
 ggplot(pm.dayly, aes(y = as.numeric(pm.dayly$Total_steps), 
                      x = as.Date(pm.dayly$Day),colour="data",shape="data",group=1 )) + 
       geom_point() +
@@ -53,11 +58,14 @@ ggplot(pm.dayly, aes(y = as.numeric(pm.dayly$Total_steps),
       theme(legend.title=element_blank())
 ```
 
+![](PA1_template_files/figure-html/MEANANDMEDIAN-1.png) 
+
 ## What is the average daily activity pattern?
 
 ###1. Make a time series plot (i.e. type = "l") of the 5-minute interval (x-axis)
 ###and the average number of steps taken, averaged across all days (y-axis)
-```{r TIMESERIE,echo=TRUE}
+
+```r
 pm.5itval <- aggregate(activity$steps, list(activity$interval), mean, na.rm=T)
 names(pm.5itval) <- c("Interval", "Average_steps")
 ggplot(pm.5itval, aes(y = as.numeric(pm.5itval$Average_steps), 
@@ -66,9 +74,12 @@ ggplot(pm.5itval, aes(y = as.numeric(pm.5itval$Average_steps),
       labs(x="5 minutes interval",y="Average Steps")
 ```
 
+![](PA1_template_files/figure-html/TIMESERIE-1.png) 
+
 ###2. Which 5-minute interval, on average across all the days in the dataset,
 ###contains the maximum number of steps?
-```{r WHICH5MINUTE,echo=TRUE}
+
+```r
 sel.5itval <- filter(pm.5itval, 
                      as.numeric(pm.5itval$Interval) >= 800 & 
                      as.numeric(pm.5itval$Interval) <= 900)
@@ -76,7 +87,11 @@ ggplot(sel.5itval, aes(y = as.numeric(sel.5itval$Average_steps),
                        x = as.numeric(sel.5itval$Interval))) + 
       geom_line() +
       labs(x="5 minutes interval",y="Average Steps")
+```
 
+![](PA1_template_files/figure-html/WHICH5MINUTE-1.png) 
+
+```r
 sel2.5itval <- filter(pm.5itval, 
                       as.numeric(pm.5itval$Interval) >= 825 & 
                       as.numeric(pm.5itval$Interval) <= 850)
@@ -86,12 +101,15 @@ ggplot(sel2.5itval, aes(y = as.numeric(sel2.5itval$Average_steps),
       labs(x="5 minutes interval",y="Average Steps")
 ```
 
+![](PA1_template_files/figure-html/WHICH5MINUTE-2.png) 
+
 
 ## Imputing missing values
 
 ###1. Calculate and report the total number of missing values in the dataset
 ###(i.e. the total number of rows with NAs)
-```{r withNAs,echo=TRUE}
+
+```r
 sel.nval <- filter(activity,is.na(activity$steps))
 sel.nval["Count"] <-1
 qtt.naval <- aggregate(sel.nval$Count, list(sel.nval$date), sum, na.rm=F)
@@ -101,12 +119,15 @@ ggplot(qtt.naval, aes(y = as.numeric(qtt.naval$Qtt_NA), x = as.Date(qtt.naval$Da
       labs(x="Date",y="Rows with NAs")
 ```
 
+![](PA1_template_files/figure-html/withNAs-1.png) 
+
 
 ###2. Devise a strategy for filling in all of the missing values in the dataset.
 ###The strategy selected is the substitution for the mean registered for the corresponding 5-minute interval
 ###3. Create a new dataset that is equal to the original dataset but with the
 ###missing data filled in.
-```{r STRATEGY,echo=TRUE}
+
+```r
 mqtt.naval <- activity %>% 
   group_by( interval ) %>%
   transform(steps = ifelse(is.na(steps), 
@@ -116,7 +137,8 @@ mqtt.naval <- activity %>%
 ```
 
 ###4. Make a histogram of the total number of steps taken each day
-```{r 2ndHISTOGRAM,echo=TRUE}
+
+```r
 pmb.dayly <- aggregate(mqtt.naval$steps, list(mqtt.naval$date), sum, na.rm=T)
 names(pmb.dayly) <- c("Day", "Total_steps")
 qplot(pmb.dayly$Total_steps,
@@ -127,10 +149,13 @@ qplot(pmb.dayly$Total_steps,
           fill=I("red"))
 ```
 
+![](PA1_template_files/figure-html/2ndHISTOGRAM-1.png) 
+
 ###Calculate and report the mean and median total number of steps taken per day.
 ###What is the impact of imputing missing data on the estimates of the total
 ###daily number of steps?
-```{r 2ndMEANMEDIAN,echo=TRUE}
+
+```r
 ggplot(pmb.dayly, aes(y = as.numeric(pmb.dayly$Total_steps), 
                       x = as.Date(pmb.dayly$Day),colour="data",shape="data",group=1 )) + 
       geom_point() +
@@ -149,11 +174,14 @@ ggplot(pmb.dayly, aes(y = as.numeric(pmb.dayly$Total_steps),
       theme(legend.title=element_blank())
 ```
 
+![](PA1_template_files/figure-html/2ndMEANMEDIAN-1.png) 
+
 ## Are there differences in activity patterns between weekdays and weekends?
 ###1. Create a new factor variable in the dataset with two levels - "weekday"
 ###and "weekend" indicating whether a given date is a weekday or weekend day.
-```{r WEEKDAYS,echo=TRUE}
-mqtt.naval$weekday <- ifelse((weekdays(as.Date(mqtt.naval$date)) == "sábado" | 
+
+```r
+mqtt.naval$weekday <- ifelse((weekdays(as.Date(mqtt.naval$date)) == "sÃ¡bado" | 
                               weekdays(as.Date(mqtt.naval$date)) == "domingo"), 
                              "weekend", "weekday")
 mmqtt.naval <- filter(mqtt.naval, mqtt.naval$weekday == "weekend")
@@ -164,7 +192,8 @@ names(aggmqtt.naval) <- c("Interval", "Average_steps")
 ###2. Make a panel plot containing a time series plot (i.e. type = "l") of the
 ###5-minute interval (x-axis) and the average number of steps taken, averaged
 ###across all weekday days or weekend days (y-axis).
-```{r PLOTWEEKDAYS,cache=TRUE}
+
+```r
 p1<-ggplot(aggmqtt.naval, aes(y = as.numeric(aggmqtt.naval$Average_steps), 
                           x = as.numeric(aggmqtt.naval$Interval))) + 
       geom_line() +
@@ -180,4 +209,6 @@ p2<-ggplot(aggmmqtt.naval, aes(y = as.numeric(aggmmqtt.naval$Average_steps),
       labs(title = "Weekday")
 grid.arrange(p1,p2, ncol = 1, main = "Differences in activity patterns")
 ```
+
+![](PA1_template_files/figure-html/PLOTWEEKDAYS-1.png) 
 
